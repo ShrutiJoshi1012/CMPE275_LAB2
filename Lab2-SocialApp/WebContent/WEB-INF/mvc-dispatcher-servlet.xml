@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:context="http://www.springframework.org/schema/context" xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:tx="http://www.springframework.org/schema/tx" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.springframework.org/schema/beans         http://www.springframework.org/schema/beans/spring-beans-3.2.xsd         http://www.springframework.org/schema/context         http://www.springframework.org/schema/context/spring-context-3.2.xsd          http://www.springframework.org/schema/mvc         http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd         http://www.springframework.org/schema/tx      http://www.springframework.org/schema/tx/spring-tx.xsd">
+   <context:component-scan base-package="edu.sjsu.cmpe275.lab2" />
+   <bean id="personDao" class="edu.sjsu.cmpe275.lab2.dao.PersonDAOImpl">
+      <constructor-arg>
+         <ref bean="sessionFactory" />
+      </constructor-arg>
+   </bean>
+   <bean id="organizationDao" class="edu.sjsu.cmpe275.lab2.dao.OrganizationDAOImpl">
+      <constructor-arg>
+         <ref bean="sessionFactory" />
+      </constructor-arg>
+   </bean>
+   
+   <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+      <property name="driverClassName" value="com.mysql.jdbc.Driver" />
+      <property name="url" value="jdbc:mysql://localhost:3306/CMPE275_LAB2" />
+      <property name="username" value="root" />
+      <property name="password" value="" />
+   </bean>
+   <bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+      <property name="dataSource" ref="dataSource" />
+      <property name="configLocation" value="classpath:hibernate.cfg.xml" />
+   </bean>
+   <bean id="transactionManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+      <property name="sessionFactory" ref="sessionFactory" />
+   </bean>
+ 
+   <mvc:annotation-driven content-negotiation-manager="contentNegotiationManager" />
+   <bean id="contentNegotiationManager" class="org.springframework.web.accept.ContentNegotiationManagerFactoryBean">
+      <property name="favorPathExtension" value="false" />
+      <property name="ignoreAcceptHeader" value="true" />
+      <property name="defaultContentType" value="application/json" />
+      <property name="useJaf" value="false" />
+      <property name="mediaTypes">
+         <map>
+            <entry key="html" value="text/html" />
+            <entry key="json" value="application/json" />
+            <entry key="xml" value="application/xml" />
+         </map>
+      </property>
+    
+   </bean>
+</beans>
