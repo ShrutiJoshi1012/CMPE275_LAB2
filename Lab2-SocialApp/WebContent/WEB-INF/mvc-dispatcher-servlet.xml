@@ -6,6 +6,7 @@
          <ref bean="sessionFactory" />
       </constructor-arg>
    </bean>
+  
    <bean id="organizationDao" class="edu.sjsu.cmpe275.lab2.dao.OrganizationDAOImpl">
       <constructor-arg>
          <ref bean="sessionFactory" />
@@ -26,19 +27,30 @@
       <property name="sessionFactory" ref="sessionFactory" />
    </bean>
  
-   <mvc:annotation-driven content-negotiation-manager="contentNegotiationManager" />
+ 
+    
+ 
+    <mvc:annotation-driven content-negotiation-manager="contentNegotiationManager" >
+  
+ 	
+    </mvc:annotation-driven>
+    
+ 
    <bean id="contentNegotiationManager" class="org.springframework.web.accept.ContentNegotiationManagerFactoryBean">
-      <property name="favorPathExtension" value="false" />
+      <property name="favorPathExtension" value="true" />
+      <property name="favorParameter" value="true" />
       <property name="ignoreAcceptHeader" value="true" />
       <property name="defaultContentType" value="application/json" />
       <property name="useJaf" value="false" />
+      
       <property name="mediaTypes">
          <map>
-            <entry key="html" value="text/html" />
+            <entry key="html" value= "text/html" />
             <entry key="json" value="application/json" />
             <entry key="xml" value="application/xml" />
          </map>
       </property>
-    
    </bean>
+  
+	
 </beans>

@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
+//import org.springframework.web.servlet.Model;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
 import org.springframework.web.servlet.view.xml.MarshallingView;
@@ -39,7 +40,7 @@ public class PersonController {
 
 	@RequestMapping(value = "/person", method = RequestMethod.POST, produces = { "application/json" })
 	public @ResponseBody
-	ModelAndView create(
+	ResponseEntity<?> create(
 			@RequestParam(value = "firstname", required = true) String firstname,
 			@RequestParam(value = "lastname", required = true) String lastname,
 			@RequestParam(value = "email", required = true) String email,
@@ -54,15 +55,13 @@ public class PersonController {
 		ModelAndView model = new ModelAndView();
 		model.setView(new MappingJackson2JsonView());
 		if (result.hasErrors()) {
-
-			return model
-					.addObject("response", new ResponseEntity<String>(
-							"Invalid Request", responseHeaders,
-							HttpStatus.BAD_REQUEST));
-
+			return new ResponseEntity<String>(
+							"Invalid Request, Missing required parameter", responseHeaders,
+							HttpStatus.BAD_REQUEST);
 		}
+		
+		
 		Person person = new Person();
-
 		person.setFirstName(firstname);
 		person.setLastName(lastname);
 		person.setEmail(email);
@@ -72,38 +71,29 @@ public class PersonController {
 		Person createdPerson = personDao.add(person);
 
 		if (createdPerson == null) {
-			return model.addObject("response", new ResponseEntity<String>(
-					"CreatePerson Failed", responseHeaders,
-					HttpStatus.EXPECTATION_FAILED));
+			return  new ResponseEntity<String>(
+					"CreatePerson Failed, Org ID does not exist in Organization", responseHeaders,
+					HttpStatus.NOT_FOUND);
 		}
 
-		return model.addObject("createdPerson", createdPerson);
-
+		return  new ResponseEntity<Person>(
+				createdPerson, responseHeaders,
+				HttpStatus.OK);
 	}
 
 	
 	
 	
 	@RequestMapping(value = "/person/{id}", method = RequestMethod.GET, produces = {
-			"application/json", "application/xml", "text/html" })
-	public ModelAndView edit(@PathVariable("id") Long id,
-			@RequestParam(value="format",required=false) String format) {
-		System.out.println("Id= " + id);
-		ModelAndView model = new ModelAndView();
-		//model.setView(new MappingJackson2XmlView());
-		//if(format == null)
-			//model.setView(new MappingJackson2JsonView());
-		/*else if(format.equalsIgnoreCase("json"))
-			model.setView(new MappingJackson2JsonView());
-		else if(format.equalsIgnoreCase("xml"))
-			model.setView(new MarshallingView());
-		else if(format.equalsIgnoreCase("html"))
-			model.setView(new MappingJackson2JsonView());*/
-		
+			"application/json", "application/xml",  "text/html" })
+	public @ResponseBody ResponseEntity<?> get(@PathVariable("id") Long id) {	
+		HttpHeaders responseHeaders = new HttpHeaders();
+		//responseHeaders.s
 		Person person = personDao.getPerson(id);
-		//System.out.println("Person getfirstName in controller::"+person.getFirstName());
-		model.addObject("", person);
-		
-		return model;
+		if(person == null)
+			return new ResponseEntity<String>(
+					"No person exists with this PersonId", responseHeaders,
+					HttpStatus.NOT_FOUND);
+		return new ResponseEntity<Person>(person,responseHeaders,HttpStatus.OK);
 	}
 }
