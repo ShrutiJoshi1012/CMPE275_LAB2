@@ -94,16 +94,16 @@ public class PersonController {
 					HttpStatus.NOT_FOUND);
 		
 	HashMap<String,Object> personObject = new HashMap<String,Object>();
-		personObject.put("detailsOfPerson", person.getFirstName());
+		personObject.put("detailsOfPerson", person);
 		
 		//person.setFriends(personDao.getFriends(id));
 		
-		//long[] friendIDs =personDao.getFriends(id);
+		long[] friendIDs =personDao.getFriends(id);
 		
 		//List<Object> obj=new ArrayList();
 		//obj.add(0, person);
-		//personObject.put("friendsOfPerson", friendIDs);
-		return new ResponseEntity<Person>(person, responseHeaders,
+		personObject.put("friendsOfPerson", friendIDs);
+		return new ResponseEntity<Object>(personObject, responseHeaders,
 				HttpStatus.OK);
 	}
 
