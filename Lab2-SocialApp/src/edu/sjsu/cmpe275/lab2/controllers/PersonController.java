@@ -2,11 +2,10 @@ package edu.sjsu.cmpe275.lab2.controllers;
 
 import java.awt.PageAttributes.MediaType;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
-
 import javax.servlet.http.HttpServletRequest;
-import com.google.gson.Gson;
 import javax.validation.*;
 
 import edu.sjsu.cmpe275.lab2.entities.*;
@@ -86,7 +85,7 @@ public class PersonController {
 
 	@RequestMapping(value = "/person/{id}", method = RequestMethod.GET, produces = {
 			"text/html", "application/json", "application/xml" })
-	public @ResponseBody ResponseEntity<?> get(@PathVariable("id") long id) {
+	public  ResponseEntity<?> get(@PathVariable("id") long id) {
 		HttpHeaders responseHeaders = new HttpHeaders();
 		Person person = personDao.getPerson(id);
 		if (person == null)
@@ -94,14 +93,22 @@ public class PersonController {
 					"No person exists with this PersonId", responseHeaders,
 					HttpStatus.NOT_FOUND);
 		
+	HashMap<String,Object> personObject = new HashMap<String,Object>();
+		personObject.put("detailsOfPerson", person.getFirstName());
 		
-		ArrayList<Object> obj= new ArrayList<Object>();
-		obj.add(0,person);
-		obj.add(1, person.getFriends());
-		return new ResponseEntity<ArrayList<Object>>(obj, responseHeaders,
+		//person.setFriends(personDao.getFriends(id));
+		
+		//long[] friendIDs =personDao.getFriends(id);
+		
+		//List<Object> obj=new ArrayList();
+		//obj.add(0, person);
+		//personObject.put("friendsOfPerson", friendIDs);
+		return new ResponseEntity<Person>(person, responseHeaders,
 				HttpStatus.OK);
 	}
 
+	
+	//Update Person
 	@RequestMapping(value = "/person/{id}", method = RequestMethod.POST, produces = { "application/json" })
 	public @ResponseBody
 	ResponseEntity<?> update(

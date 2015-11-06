@@ -40,17 +40,18 @@ public class Person implements java.io.Serializable {
 	private Address address;
 
 	private Organization organization;
-	
-	private List<Person> friends=  new ArrayList<Person>();
+
+	@Transient
+	private List<Person> friends = new ArrayList<Person>();
 
 	public Person() {
 	}
 
-	public Person(long personid, String firstName, String lastName,String email) {
-		this.personId=personid;
+	public Person(long personid, String firstName, String lastName, String email) {
+		this.personId = personid;
 		this.firstName = firstName;
 		this.lastName = lastName;
-		this.email=email;
+		this.email = email;
 	}
 
 	public Person(String firstName, String lastName, String email,
@@ -124,31 +125,23 @@ public class Person implements java.io.Serializable {
 		this.address = address;
 	}
 
-	
-	@XmlElementWrapper
-	@XmlElement(name="friend")
-	@JsonIgnore 
-	@ManyToMany(fetch = FetchType.LAZY, cascade=CascadeType.ALL)
-	@JoinTable(name="Friendship",
-	 joinColumns=@JoinColumn(name="PersonID"),
-	 inverseJoinColumns=@JoinColumn(name="FriendID")
-	)	
+	@XmlElementWrapper(name="friends")
+	@XmlElement(name = "friend")	
+	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@JoinTable(name = "Friendship", joinColumns = @JoinColumn(name = "PersonID"), 
+		inverseJoinColumns = @JoinColumn(name = "FriendID"))
+	@JsonIgnore
 	public List<Person> getFriends() {
-		System.out.println("getFriends: "+friends.size());
 		return friends;
 	}
 
 	public void setFriends(List<Person> friends) {
-		
-		System.out.println("Before param Friends: "+friends.size());
-		System.out.println("Before setFriends: "+this.friends.size());
 		this.friends = friends;
-		System.out.println("After setFriends: "+this.friends.size());
+
 	}
 
-	
 	@XmlElement
-	@ManyToOne(cascade=CascadeType.PERSIST)
+	@ManyToOne(cascade = CascadeType.PERSIST)
 	@JoinColumn(name = "organizationId")
 	public Organization getOrganization() {
 		return organization;

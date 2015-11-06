@@ -1,5 +1,6 @@
 package edu.sjsu.cmpe275.lab2.dao;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.HibernateException;
@@ -98,10 +99,11 @@ public class PersonDAOImpl implements PersonDAO {
 
 	@Override
 	public Person getPerson(Long id) {
+		System.out.println("IN GetPerson");
 		Session session = sessionFactory.getCurrentSession();
 		Person person = null;
 		try {
-			System.out.println("IN GetPerson");
+			
 			session.beginTransaction();
 			person = (Person) session.get(Person.class, id);
 		} catch (HibernateException e) {
@@ -127,6 +129,34 @@ public class PersonDAOImpl implements PersonDAO {
 		}
 		session.getTransaction().commit();
 		return person;
+	}
+
+	@Override
+	public long[] getFriends(Long id) {
+		// TODO Auto-generated method stub
+		
+		System.out.println("IN GetFriends");
+		Session session = sessionFactory.getCurrentSession();
+		List<Person> friends = new ArrayList<Person>();
+		session.beginTransaction();
+		long[] friendIDs =null;;
+		Person person=null;
+		try {
+			
+			person = (Person) session.get(Person.class, id);
+			friends.addAll(person.getFriends());
+			friendIDs=new long[friends.size()];
+			int i=0;
+			for(Person friend:friends){
+				friendIDs[i]=friend.getPersonId();
+				i++;
+			}
+		} catch (HibernateException e) {
+			e.printStackTrace();
+			session.getTransaction().rollback();
+		}
+		session.getTransaction().commit();
+		return friendIDs;
 	}
 
 }
