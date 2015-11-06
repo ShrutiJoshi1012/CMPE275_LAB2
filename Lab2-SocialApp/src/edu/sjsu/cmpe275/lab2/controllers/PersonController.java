@@ -6,7 +6,7 @@ import java.util.List;
 
 
 import javax.servlet.http.HttpServletRequest;
-//import com.google.gson.Gson;
+import com.google.gson.Gson;
 import javax.validation.*;
 
 import edu.sjsu.cmpe275.lab2.entities.*;
@@ -33,9 +33,6 @@ import org.springframework.web.servlet.ModelAndView;
 //import org.springframework.web.servlet.Model;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
-import org.springframework.web.servlet.view.xml.MarshallingView;
-import org.springframework.web.servlet.view.xml.MappingJackson2XmlView;
-import org.springframework.util.MimeType;
 
 
 @Controller
@@ -96,8 +93,12 @@ public class PersonController {
 			return new ResponseEntity<String>(
 					"No person exists with this PersonId", responseHeaders,
 					HttpStatus.NOT_FOUND);
-
-		return new ResponseEntity<Person>(person, responseHeaders,
+		
+		
+		ArrayList<Object> obj= new ArrayList<Object>();
+		obj.add(0,person);
+		obj.add(1, person.getFriends());
+		return new ResponseEntity<ArrayList<Object>>(obj, responseHeaders,
 				HttpStatus.OK);
 	}
 
@@ -114,9 +115,8 @@ public class PersonController {
 			@ModelAttribute("zip") String zip,
 			@RequestParam(value = "orgid", required = false) Long organizationid,
 			@PathVariable("id") long id, BindingResult result) {
-		HttpHeaders responseHeaders = new HttpHeaders();
+			HttpHeaders responseHeaders = new HttpHeaders();
 
-		System.out.println("Inside person controller");
 		if (result.hasErrors()) {
 			return new ResponseEntity<String>(
 					"Invalid Request, Missing required parameter",

@@ -118,7 +118,10 @@ public class PersonDAOImpl implements PersonDAO {
 		Session session = sessionFactory.getCurrentSession();
 		session.beginTransaction();
 		Person person = (Person) session.get(Person.class, id);
-		if (person != null) {
+		if (person != null) {		
+			session.createQuery("delete Friendship where PersonID = :id OR FriendID = :id") 
+		    .setParameter("id", id)
+		    .executeUpdate();
 			session.delete(person);
 			session.flush();
 		}
