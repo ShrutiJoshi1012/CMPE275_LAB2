@@ -55,9 +55,11 @@ public class Person implements java.io.Serializable {
 	public Person() {
 	}
 
-	public Person(String firstName, String lastName) {
+	public Person(long personid, String firstName, String lastName,String email) {
+		this.personId=personid;
 		this.firstName = firstName;
 		this.lastName = lastName;
+		this.email=email;
 	}
 
 	public Person(String firstName, String lastName, String email,
@@ -142,7 +144,7 @@ public class Person implements java.io.Serializable {
 
 	
 	@XmlElement
-	@ManyToOne
+	@ManyToOne(cascade=CascadeType.PERSIST)
 	@JoinColumn(name = "organizationId")
 	public Organization getOrganization() {
 		return organization;
