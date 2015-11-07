@@ -11,6 +11,7 @@ package edu.sjsu.cmpe275.lab2.entities;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import javax.persistence.Transient;
+import javax.xml.bind.annotation.XmlElement;
 
 
 
@@ -35,6 +36,7 @@ public class Address {
 
 
 
+	@XmlElement
 	@Column(name = "Street", length = 100)
 	public String getStreet() {
 		return this.street;
@@ -44,6 +46,7 @@ public class Address {
 		this.street = street;
 	}
 
+	@XmlElement
 	@Column(name = "City", length = 50)
 	public String getCity() {
 		return this.city;
@@ -53,6 +56,7 @@ public class Address {
 		this.city = city;
 	}
 
+	@XmlElement
 	@Column(name = "State", length = 30)
 	public String getState() {
 		return this.state;
@@ -61,7 +65,8 @@ public class Address {
 	public void setState(String state) {
 		this.state = state;
 	}
-
+	
+	@XmlElement
 	@Column(name = "Zip", length = 10)
 	public String getZip() {
 		return this.zip;

@@ -11,6 +11,6 @@ public interface PersonDAO {
     public Person  updatePerson(Person person);
     public Person  getPerson(Long id);
     public Person  deletePerson(Long id);
-    public long[]  getFriends(Long id);
+    public List<Person> getFriends(Long id);
  
 }

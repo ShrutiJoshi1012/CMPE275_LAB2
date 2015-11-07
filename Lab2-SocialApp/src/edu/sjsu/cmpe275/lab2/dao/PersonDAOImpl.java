@@ -3,16 +3,17 @@ package edu.sjsu.cmpe275.lab2.dao;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.transaction.annotation.*;
 
+import edu.sjsu.cmpe275.lab2.entities.Friendship;
 import edu.sjsu.cmpe275.lab2.entities.Organization;
 import edu.sjsu.cmpe275.lab2.entities.Person;
 
-@Transactional
+@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT)
 public class PersonDAOImpl implements PersonDAO {
 
 	private SessionFactory sessionFactory;
@@ -32,10 +33,8 @@ public class PersonDAOImpl implements PersonDAO {
 			if (person.getOrganization() != null) {
 				// If person's organization is not required to be set
 				long orgId = person.getOrganization().getOrganizationId();
-
 				organizationNew = (Organization) session.get(
-						Organization.class, person.getOrganization()
-								.getOrganizationId());
+						Organization.class, orgId);
 				if (organizationNew == null)
 					// If Organization does not exist in database return NULL
 					return null;
@@ -81,7 +80,6 @@ public class PersonDAOImpl implements PersonDAO {
 					person.setOrganization(organization);
 			}
 
-			
 			personBeforeUpdate.setAddress(person.getAddress());
 			personBeforeUpdate.setDescription(person.getDescription());
 			personBeforeUpdate.setEmail(person.getEmail());
@@ -103,9 +101,10 @@ public class PersonDAOImpl implements PersonDAO {
 		Session session = sessionFactory.getCurrentSession();
 		Person person = null;
 		try {
-			
+
 			session.beginTransaction();
 			person = (Person) session.get(Person.class, id);
+
 		} catch (HibernateException e) {
 			e.printStackTrace();
 			session.getTransaction().rollback();
@@ -120,10 +119,10 @@ public class PersonDAOImpl implements PersonDAO {
 		Session session = sessionFactory.getCurrentSession();
 		session.beginTransaction();
 		Person person = (Person) session.get(Person.class, id);
-		if (person != null) {		
-			session.createQuery("delete Friendship where PersonID = :id OR FriendID = :id") 
-		    .setParameter("id", id)
-		    .executeUpdate();
+		if (person != null) {
+			session.createQuery(
+					"delete Friendship where PersonID = :id OR FriendID = :id")
+					.setParameter("id", id).executeUpdate();
 			session.delete(person);
 			session.flush();
 		}
@@ -132,31 +131,31 @@ public class PersonDAOImpl implements PersonDAO {
 	}
 
 	@Override
-	public long[] getFriends(Long id) {
+	public List<Person> getFriends(Long id) {
 		// TODO Auto-generated method stub
-		
+
 		System.out.println("IN GetFriends");
 		Session session = sessionFactory.getCurrentSession();
 		List<Person> friends = new ArrayList<Person>();
 		session.beginTransaction();
-		long[] friendIDs =null;;
-		Person person=null;
 		try {
-			
-			person = (Person) session.get(Person.class, id);
-			friends.addAll(person.getFriends());
-			friendIDs=new long[friends.size()];
-			int i=0;
-			for(Person friend:friends){
-				friendIDs[i]=friend.getPersonId();
-				i++;
+
+			List<Friendship> friendsList = session
+					.createQuery("from Friendship where PersonID = :id")
+					.setParameter("id", id).list();
+
+			for (int i = 0; i < friendsList.size(); i++) {
+				friends.add((Person) session.get(Person.class,
+						friendsList.get(i).getFriendId()));
+
 			}
+
 		} catch (HibernateException e) {
 			e.printStackTrace();
 			session.getTransaction().rollback();
 		}
 		session.getTransaction().commit();
-		return friendIDs;
+		return friends;
 	}
 
 }

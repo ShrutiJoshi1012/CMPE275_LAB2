@@ -33,13 +33,13 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
 
-
 @Controller
 public class PersonController {
 
 	@Autowired
 	private PersonDAO personDao;
-	//ArrayList<MediaType> mediaTypes = new ArrayList<MediaType>();
+
+	// ArrayList<MediaType> mediaTypes = new ArrayList<MediaType>();
 
 	@RequestMapping(value = "/person", method = RequestMethod.POST, produces = { "application/json" })
 	public @ResponseBody
@@ -85,7 +85,7 @@ public class PersonController {
 
 	@RequestMapping(value = "/person/{id}", method = RequestMethod.GET, produces = {
 			"text/html", "application/json", "application/xml" })
-	public  ResponseEntity<?> get(@PathVariable("id") long id) {
+	public ResponseEntity<?> get(@PathVariable("id") long id) {
 		HttpHeaders responseHeaders = new HttpHeaders();
 		Person person = personDao.getPerson(id);
 		if (person == null)
@@ -93,22 +93,12 @@ public class PersonController {
 					"No person exists with this PersonId", responseHeaders,
 					HttpStatus.NOT_FOUND);
 		
-	HashMap<String,Object> personObject = new HashMap<String,Object>();
-		personObject.put("detailsOfPerson", person);
-		
-		//person.setFriends(personDao.getFriends(id));
-		
-		long[] friendIDs =personDao.getFriends(id);
-		
-		//List<Object> obj=new ArrayList();
-		//obj.add(0, person);
-		personObject.put("friendsOfPerson", friendIDs);
-		return new ResponseEntity<Object>(personObject, responseHeaders,
+		person.setFriends(personDao.getFriends(id));
+		return new ResponseEntity<Object>(person, responseHeaders,
 				HttpStatus.OK);
 	}
 
-	
-	//Update Person
+	// Update Person
 	@RequestMapping(value = "/person/{id}", method = RequestMethod.POST, produces = { "application/json" })
 	public @ResponseBody
 	ResponseEntity<?> update(
@@ -122,7 +112,7 @@ public class PersonController {
 			@ModelAttribute("zip") String zip,
 			@RequestParam(value = "orgid", required = false) Long organizationid,
 			@PathVariable("id") long id, BindingResult result) {
-			HttpHeaders responseHeaders = new HttpHeaders();
+		HttpHeaders responseHeaders = new HttpHeaders();
 
 		if (result.hasErrors()) {
 			return new ResponseEntity<String>(
@@ -147,6 +137,7 @@ public class PersonController {
 				HttpStatus.OK);
 	}
 
+	// Delete Person
 	@RequestMapping(value = "/person/{id}", method = RequestMethod.DELETE, produces = { "application/json" })
 	public ResponseEntity<?> delete(@PathVariable("id") long id) {
 		HttpHeaders responseHeaders = new HttpHeaders();

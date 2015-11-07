@@ -18,34 +18,34 @@ import javax.persistence.Table;
 public class Friendship implements java.io.Serializable {
 
 
-	private int personId;
-	private int friendId;
+	private long personId;
+	private long friendId;
 
 	public Friendship() {
 	}
 
-	public Friendship(int personId, int friendId) {
+	public Friendship(long personId, long friendId) {
 		this.personId = personId;
 		this.friendId = friendId;
 	}
 
 	@Id
 	@Column(name = "PersonID", nullable = false)
-	public int getPersonId() {
+	public long getPersonId() {
 		return this.personId;
 	}
 
-	public void setPersonId(int personId) {
+	public void setPersonId(long personId) {
 		this.personId = personId;
 	}
 
 	@Id
 	@Column(name = "FriendID", nullable = false)
-	public int getFriendId() {
+	public long getFriendId() {
 		return this.friendId;
 	}
 
-	public void setFriendId(int friendId) {
+	public void setFriendId(long friendId) {
 		this.friendId = friendId;
 	}
 
