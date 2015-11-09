@@ -32,10 +32,10 @@
     </session-config>
   
    
- <!--
+
 <servlet-mapping>
   <servlet-name>jsp</servlet-name>
-  <url-pattern>/WEB-INF/pages/*</url-pattern>
+  <url-pattern>/WEB-INF/views/*</url-pattern>
  </servlet-mapping>
- -->
+
 </web-app>

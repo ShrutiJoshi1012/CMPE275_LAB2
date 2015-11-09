@@ -1,45 +1,34 @@
 package edu.sjsu.cmpe275.lab2.controllers;
 
-import java.awt.PageAttributes.MediaType;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
-import javax.validation.*;
 
 import edu.sjsu.cmpe275.lab2.entities.*;
 import edu.sjsu.cmpe275.lab2.dao.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Configuration;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
+
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestHeader;
+
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+
 import org.springframework.web.servlet.ModelAndView;
-//import org.springframework.web.servlet.Model;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
-import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
 
 @Controller
 public class PersonController {
 
+	// Initialized via Bean
 	@Autowired
 	private PersonDAO personDao;
-
-	// ArrayList<MediaType> mediaTypes = new ArrayList<MediaType>();
 
 	@RequestMapping(value = "/person", method = RequestMethod.POST, produces = { "application/json" })
 	public @ResponseBody
@@ -55,8 +44,6 @@ public class PersonController {
 			@RequestParam(value = "orgid", required = false) Long organizationid,
 			BindingResult result) {
 		HttpHeaders responseHeaders = new HttpHeaders();
-		ModelAndView model = new ModelAndView();
-		model.setView(new MappingJackson2JsonView());
 		if (result.hasErrors()) {
 			return new ResponseEntity<String>(
 					"Invalid Request, Missing required parameter",
@@ -73,18 +60,20 @@ public class PersonController {
 			person.setOrganization(new Organization(organizationid));
 		Person createdPerson = personDao.addPerson(person);
 
-		if (createdPerson == null) {
+		if (createdPerson == null)
 			return new ResponseEntity<String>(
 					"CreatePerson Failed, Org ID does not exist in Organization",
 					responseHeaders, HttpStatus.NOT_FOUND);
-		}
-
+		if (createdPerson.getDescription().equals("EmailError"))
+			return new ResponseEntity<String>(
+					"EmailID has to be a unique value. This value already exists.",
+					responseHeaders, HttpStatus.BAD_REQUEST);
 		return new ResponseEntity<Person>(createdPerson, responseHeaders,
 				HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/person/{id}", method = RequestMethod.GET, produces = {
-			"text/html", "application/json", "application/xml" })
+			"application/json", "application/xml" })
 	public ResponseEntity<?> get(@PathVariable("id") long id) {
 		HttpHeaders responseHeaders = new HttpHeaders();
 		Person person = personDao.getPerson(id);
@@ -92,7 +81,7 @@ public class PersonController {
 			return new ResponseEntity<String>(
 					"No person exists with this PersonId", responseHeaders,
 					HttpStatus.NOT_FOUND);
-		
+
 		person.setFriends(personDao.getFriends(id));
 		return new ResponseEntity<Object>(person, responseHeaders,
 				HttpStatus.OK);
@@ -150,6 +139,22 @@ public class PersonController {
 
 		return new ResponseEntity<Person>(person, responseHeaders,
 				HttpStatus.OK);
+	}
+
+	@RequestMapping(value = "/person/{id}", method = RequestMethod.GET, produces = { "text/html" })
+	public Object getPersonHTML(@PathVariable("id") Long id,
+			ModelAndView model, HttpServletRequest request) {
+		model.setViewName("person");
+		Person person = personDao.getPerson(id);
+		if (person == null) {
+			model.addObject("message", "No person exists with this PersonId");
+			return new ResponseEntity<String>(
+					"No person exists with this PersonId", HttpStatus.NOT_FOUND);
+		}
+		model.addObject("message", "Person Details");
+		person.setFriends(personDao.getFriends(id));
+		model.addObject("person", person);
+		return model;
 	}
 
 }

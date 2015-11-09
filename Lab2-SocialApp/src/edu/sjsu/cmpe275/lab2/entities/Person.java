@@ -9,7 +9,7 @@ import java.util.List;
 import javax.persistence.*;
 
 import static javax.persistence.GenerationType.IDENTITY;
-
+import org.hibernate.validator.constraints.Email;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlElement;
@@ -27,12 +27,14 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @XmlRootElement(name = "person" ) 
 @Entity
-@Table(name = "Person", catalog = "CMPE275_LAB2")
+@Table(name = "Person", catalog = "CMPE275_LAB2",uniqueConstraints = @UniqueConstraint(columnNames = {"Email"}))
 public class Person implements java.io.Serializable {
 
 	private long personId;
 	private String firstName;
 	private String lastName;
+	
+	@Email(message="Please provide a valid email address")
 	private String email;
 	private String description;
 
